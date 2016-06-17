@@ -1,16 +1,12 @@
 import "./RoundLib.sol";
 
-contract BTCRelay {
-    function getBlockHash(uint blockHeight) returns (uint);
-    function getLastBlockHeight() returns (uint);
-}
 
 contract BTCLotto{
   using RoundLib for RoundLib.Round;
-  address btcRelay = "0x41f274c0023f83391de4e0733c609df5a124c3d4";
+  address btcRelay = 0x41f274c0023f83391de4e0733c609df5a124c3d4;
   uint i;
   mapping(uint => RoundLib.Round) rounds;
-  uint constant maxVal;
+  uint maxVal;
   uint constant roundLen = 6;
   uint constant price = 1 ether;
 
@@ -23,18 +19,19 @@ contract BTCLotto{
   }
 
   function newRound(){
-    rounds[i].newRound()
+    uint blockHeight = BTCRelay(btcRelay).getLastBlockHeight();
+    rounds[i].newRound(blockHeight, price, maxVal);
   }
 
   function buyTicket(uint roundIndex){
-    rounds[roundIndex].buyTickets(BTCRelay(btcRelay).getLastBlockHeight() + roundLen, price, maxVal);
+    rounds[roundIndex].buyTickets(btcRelay);
   }
 
   function payOut(uint roundIndex){
     rounds[roundIndex].payOut(btcRelay);
   }
 
-  
+
 
 
 }

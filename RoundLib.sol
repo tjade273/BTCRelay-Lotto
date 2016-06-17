@@ -14,7 +14,7 @@ library RoundLib{
     address[] tickets;
     uint value;
 
-    Phase phase
+    Phase phase;
   }
 
   function newRound(Round storage self, uint blockNumber, uint price, uint maxVal){
@@ -23,10 +23,10 @@ library RoundLib{
     self.price = price;
   }
 
-  function buyTickets(Round storage self){
-    updatePhase();
+  function buyTickets(Round storage self, address btcRelay){
+    updatePhase(self, btcRelay);
 
-    if(self.Phase != Phase.Buy) throw;
+    if(self.phase != Phase.Buy) throw;
     if(self.value + msg.value > self.maxVal) throw;
 
     for(uint i; i<msg.value/self.price; i++){
@@ -39,15 +39,15 @@ library RoundLib{
   }
 
   function payOut(Round storage self, address btcRelay){
-    updatePhase();
+    updatePhase(self, btcRelay);
 
     if(self.phase != Phase.Claim) throw;
 
-    blockHash = BTCRelay(btcRelay).getBlockHash(self.btcBlockNum);
+    uint blockHash = BTCRelay(btcRelay).getBlockHash(self.btcBlockNum);
 
     if(blockHash == 0) throw;
 
-    address winner = self.tickets[sha3(blockhash)%self.tickets.length];
+    address winner = self.tickets[uint(sha3(blockHash))%self.tickets.length];
 
     self.phase = Phase.Ended;
     winner.send(self.value);
