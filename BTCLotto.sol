@@ -1,5 +1,5 @@
 import "./RoundLib.sol";
-
+import "./PriceFeed.sol"
 
 contract BTCLotto{
   using RoundLib for RoundLib.Round;
@@ -38,6 +38,11 @@ contract BTCLotto{
       return (rounds[i].tickets,rounds[i].value,rounds[i].btcBlockNum,rounds[i].phase);
   }
 
+  function updateMaxVal(){
+    uint val = PriceFeed.price();
+
+    maxVal = (10^6/val)*25;
+  }
 
 
 
