@@ -1,6 +1,7 @@
 contract BTCRelay {
-    function getBlockHash(uint blockHeight) returns (uint);
+    function getBlockHeader(uint blockHash) returns (uint);
     function getLastBlockHeight() returns (uint);
+    function getBlockchainHead() returns (uint);
 }
 
 library RoundLib{
