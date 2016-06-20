@@ -1,9 +1,3 @@
-contract BTCRelay {
-    function getBlockHeader(uint blockHash) returns (uint);
-    function getLastBlockHeight() returns (uint);
-    function getBlockchainHead() returns (uint);
-}
-
 library RoundLib{
 
   enum Phase {Buy, Wait, Claim, Ended}
