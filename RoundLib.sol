@@ -1,8 +1,9 @@
+import "./BlockhashFetch.sol";
 library RoundLib{
 
   enum Phase {Buy, Wait, Claim, Ended}
   struct Round {
-    uint btcBlockNum;
+    int btcBlockNum;
     uint maxVal;
     uint price;
 
@@ -11,15 +12,17 @@ library RoundLib{
 
     Phase phase;
   }
+  address constant btcRelay = 0x41f274c0023f83391de4e0733c609df5a124c3d4;
+  address constant btcRelayFetch = 0x32304cdbe41fe4f1c48b08356414a52957d22d3b;
 
-  function newRound(Round storage self, uint blockNumber, uint price, uint maxVal){
+  function newRound(Round storage self, int blockNumber, uint price, uint maxVal){
     self.btcBlockNum = blockNumber;
     self.maxVal = maxVal;
     self.price = price;
   }
 
-  function buyTickets(Round storage self, address btcRelay){
-    updatePhase(self, btcRelay);
+  function buyTickets(Round storage self){
+    updatePhase(self);
 
     if(self.phase != Phase.Buy) throw;
     if(self.value + msg.value > self.maxVal) throw;
@@ -33,12 +36,13 @@ library RoundLib{
 
   }
 
-  function payOut(Round storage self, address btcRelay){
-    updatePhase(self, btcRelay);
+  function payOut(Round storage self){
+    updatePhase(self);
 
     if(self.phase != Phase.Claim) throw;
-
-    uint blockHash = BTCRelay(btcRelay).getBlockHash(self.btcBlockNum);
+    uint fee;
+    bytes32 blockHash;
+    (blockHash, fee)= BlockhashFetch(btcRelayFetch).getBlockHash(int(self.btcBlockNum));
 
     if(blockHash == 0) throw;
 
@@ -48,8 +52,8 @@ library RoundLib{
     winner.send(self.value);
   }
 
-  function updatePhase(Round storage self, address btcRelay){
-    uint block = BTCRelay(btcRelay).getLastBlockHeight();
+  function updatePhase(Round storage self){
+    int block = BTCRelay(btcRelay).getLastBlockHeight();
     if(self.phase == Phase.Ended) return;
     if(block-1 >  self.btcBlockNum){
       self.phase = Phase.Buy;
