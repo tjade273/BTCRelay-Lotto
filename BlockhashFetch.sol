@@ -1,8 +1,8 @@
 contract BTCRelay {
-    function getBlockHeader(uint blockHash) returns (bytes32[3]);
-    function getLastBlockHeight() returns (uint);
-    function getBlockchainHead() returns (uint);
-    function getFeeAmount(uint blockHash) returns (uint);
+    function getBlockHeader(int blockHash) returns (bytes32[3]);
+    function getLastBlockHeight() returns (int);
+    function getBlockchainHead() returns (int);
+    function getFeeAmount(int blockHash) returns (int);
 }
 
 
@@ -16,9 +16,9 @@ contract BlockhashFetch {
   }
 
 
-  function getPrevHash(uint prevHash) returns (bytes32 hash){
+  function getPrevHash(int prevHash) returns (bytes32 hash){
 
-    uint fee = relay.getFeeAmount(prevHash);
+    uint fee = uint(relay.getFeeAmount(prevHash));
     bytes32 head = relay.getBlockHeader.value(fee)(prevHash)[2];
     bytes32 temp;
 
