@@ -16,10 +16,10 @@ contract BlockhashFetch {
   }
 
 
-  function getPrevHash(int prevHash) returns (bytes32 hash){
+  function getPrevHash(int currentHash) returns (bytes32 parentHash){
 
-    uint fee = uint(relay.getFeeAmount(prevHash));
-    bytes32 head = relay.getBlockHeader.value(fee)(prevHash)[2];
+    uint fee = uint(relay.getFeeAmount(currentHash));
+    bytes32 head = relay.getBlockHeader.value(fee)(currentHash)[2];
     bytes32 temp;
 
     assembly {
@@ -29,11 +29,8 @@ contract BlockhashFetch {
     }
 
     for(uint i; i<32; i++){
-      hash = hash | bytes32(uint(temp[i]) * (0x100**i));
+      parentHash = parentHash | bytes32(uint(temp[i]) * (0x100**i));
     }
-
-
-    return hash;
   }
 
 
